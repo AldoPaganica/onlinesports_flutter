@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:onlinesports_flutter/screens/pagina_home_screen.dart';
@@ -6,8 +6,9 @@ import '../reusable_widgets/reusable_widget.dart';
 import '../utils/color_utils.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  SignUpScreen({Key? key}) : super(key: key);
 
+  
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
@@ -20,6 +21,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController _surnameTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    CollectionReference users = FirebaseFirestore.instance.collection("Users");
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -72,19 +74,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    firebaseUIButton(context, "Registrati", () {
-                      FirebaseAuth.instance
-                          .createUserWithEmailAndPassword(
-                          email: _emailTextController.text,
-                          password: _passwordTextController.text)
-                          .then((value) {
+                    firebaseUIButton(context, "Registrati", () async{
+                      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                        email: _emailTextController.text,
+                        password: _passwordTextController.text,
+                      );
+                      var dbRef = FirebaseFirestore.instance.collection("Users").doc(_emailTextController.text);
+                      dbRef.set({'username': _userNameTextController.text,
+                                 'nome': _nameTextController.text,
+                                 'cognome': _surnameTextController.text,
+                                 'email': _emailTextController.text});
+                        })
+                        .then((value) {
                         print("Creato un nuovo account");
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) => HomeScreen()));
                       }).onError((error, stackTrace) {
                         print("Errore ${error.toString()}");
                       });
-                    })
+                    });
                   ],
                 ),
               ))),
