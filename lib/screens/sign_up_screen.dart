@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:onlinesports_flutter/screens/pagina_home_screen.dart';
 import '../reusable_widgets/reusable_widget.dart';
 import '../utils/color_utils.dart';
+import 'package:calendar_view/calendar_view.dart';
 
 class SignUpScreen extends StatefulWidget {
   SignUpScreen({Key? key}) : super(key: key);
@@ -14,16 +16,28 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _userNameTextController = TextEditingController();
-  TextEditingController _nameTextController = TextEditingController();
-  TextEditingController _surnameTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _userNameTextController = TextEditingController();
+  final TextEditingController _nameTextController = TextEditingController();
+  final TextEditingController _surnameTextController = TextEditingController();
+  final CalendarControllerProvider _calendarController= CalendarControllerProvider(
+  controller: EventController(),
+  child: MaterialApp(
+      // Your initialization for material app.
+      ),
+  );
+
+
+
+
   @override
   Widget build(BuildContext context) {
     CollectionReference users = FirebaseFirestore.instance.collection("Users");
+
     return Scaffold(
       extendBodyBehindAppBar: true,
+
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -41,14 +55,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 hexStringToColor("9546C4"),
                 hexStringToColor("5E61F4")
               ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+
           child: SingleChildScrollView(
+
               child: Padding(
                 padding: EdgeInsets.fromLTRB(20, 120, 20, 0),
                 child: Column(
                   children: <Widget>[
-                    const SizedBox(
-                      height: 20,
-                    ),
                     reusableTextField("Inserisci l'username", Icons.person_outline, false,
                         _userNameTextController),
                     const SizedBox(
@@ -74,6 +87,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(
                       height: 20,
                     ),
+
+                 MonthView(controller: EventController(),
+                   // to provide custom UI for month cells.
+                   cellBuilder: (date, events, isToday, isInMonth) {
+                     // Return your widget to display as month cell.
+                     return Container();
+                   },
+                   minMonth: DateTime(1940),
+                   maxMonth: DateTime(2023),
+                   initialMonth: DateTime(2008),
+                   cellAspectRatio: 1,
+                   onPageChange: (date, pageIndex) => print("$date, $pageIndex"),
+                   onCellTap: (events, date) {
+                     // Implement callback when user taps on a cell.
+                     print(events);
+                   },
+                   startDay: WeekDays.monday, // To change the first day of the week.
+                   // This callback will only work if cellBuilder is null.
+                   onEventTap: (event, date) => print(event),
+                   onDateLongPress: (date) => print(date),
+                 ),
+                    const SizedBox(
+                      height: 100,
+                    ),
                     firebaseUIButton(context, "Registrati", () async{
                       await FirebaseAuth.instance.createUserWithEmailAndPassword(
                         email: _emailTextController.text,
@@ -83,8 +120,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       dbRef.set({'username': _userNameTextController.text,
                                  'nome': _nameTextController.text,
                                  'cognome': _surnameTextController.text,
-                                 'email': _emailTextController.text});
-                        })
+                                 'email': _emailTextController.text,
+
+                      })
                         .then((value) {
                         print("Creato un nuovo account");
                         Navigator.push(context,
@@ -92,11 +130,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       }).onError((error, stackTrace) {
                         print("Errore ${error.toString()}");
                       });
-                    });
+                    })
                   ],
                 ),
               ))),
+
     );
+
+  }
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<CalendarControllerProvider<Object?>>('_calendarController', _calendarController));
   }
 }
 
