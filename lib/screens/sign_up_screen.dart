@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:onlinesports_flutter/screens/pagina_home_screen.dart';
 import '../reusable_widgets/reusable_widget.dart';
 import '../utils/color_utils.dart';
-import 'package:calendar_view/calendar_view.dart';
+import 'package:intl/intl.dart';
+
 
 class SignUpScreen extends StatefulWidget {
   SignUpScreen({Key? key}) : super(key: key);
@@ -21,19 +22,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _userNameTextController = TextEditingController();
   final TextEditingController _nameTextController = TextEditingController();
   final TextEditingController _surnameTextController = TextEditingController();
-  final CalendarControllerProvider _calendarController= CalendarControllerProvider(
-  controller: EventController(),
-  child: MaterialApp(
-      // Your initialization for material app.
-      ),
-  );
-
-
+  TextEditingController dateInput = TextEditingController();
+  @override
+  void initState() {
+    dateInput.text = ""; //set the initial value of text field
+    super.initState();
+  }
 
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference users = FirebaseFirestore.instance.collection("Users");
+
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -49,17 +48,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
+
           decoration: BoxDecoration(
               gradient: LinearGradient(colors: [
                 hexStringToColor("CB2B93"),
                 hexStringToColor("9546C4"),
                 hexStringToColor("5E61F4")
-              ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+              ], begin: Alignment.topCenter, end: Alignment.bottomCenter)
+
+          ),
 
           child: SingleChildScrollView(
 
               child: Padding(
-                padding: EdgeInsets.fromLTRB(20, 120, 20, 0),
+                padding: const EdgeInsets.fromLTRB(20, 120, 20, 0),
                 child: Column(
                   children: <Widget>[
                     reusableTextField("Inserisci l'username", Icons.person_outline, false,
@@ -88,28 +90,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       height: 20,
                     ),
 
-                 MonthView(controller: EventController(),
-                   // to provide custom UI for month cells.
-                   cellBuilder: (date, events, isToday, isInMonth) {
-                     // Return your widget to display as month cell.
-                     return Container();
-                   },
-                   minMonth: DateTime(1940),
-                   maxMonth: DateTime(2023),
-                   initialMonth: DateTime(2008),
-                   cellAspectRatio: 1,
-                   onPageChange: (date, pageIndex) => print("$date, $pageIndex"),
-                   onCellTap: (events, date) {
-                     // Implement callback when user taps on a cell.
-                     print(events);
-                   },
-                   startDay: WeekDays.monday, // To change the first day of the week.
-                   // This callback will only work if cellBuilder is null.
-                   onEventTap: (event, date) => print(event),
-                   onDateLongPress: (date) => print(date),
-                 ),
+                    TextField(
+                      controller: dateInput,
+                      //editing controller of this TextField
+                      decoration: const InputDecoration(
+                          icon: Icon(Icons.calendar_today),//icon of text field
+                          labelText: "Inserisci la tua data di nascita" , labelStyle: TextStyle(color: Colors.white)//label text of field
+
+                      ), style: const TextStyle(color: Colors.white) ,
+                      readOnly: true,
+                      //set it true, so that user will not able to edit text
+                      onTap: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime(2008),
+                            firstDate: DateTime(1950),
+
+                            //DateTime.now() - not to allow to choose before today.
+                            lastDate: DateTime.now());
+
+                        if (pickedDate != null) {
+                          print(
+                              pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                          String formattedDate =
+                          DateFormat('dd/MM/yyyy').format(pickedDate);
+                          print(
+                              formattedDate); //formatted date output using intl package =>  2021-03-16
+                          setState(() {
+                            dateInput.text =
+                                formattedDate; //set output date to TextField value.
+                          });
+                        } else {}
+                      },
+                    ),
+
                     const SizedBox(
-                      height: 100,
+                      height: 50,
                     ),
                     firebaseUIButton(context, "Registrati", () async{
                       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -121,7 +137,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                  'nome': _nameTextController.text,
                                  'cognome': _surnameTextController.text,
                                  'email': _emailTextController.text,
-
+                                 'data': dateInput.text
                       })
                         .then((value) {
                         print("Creato un nuovo account");
@@ -138,11 +154,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
 
   }
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<CalendarControllerProvider<Object?>>('_calendarController', _calendarController));
-  }
+
 }
 
 
