@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:onlinesports_flutter/screens/sign_in_screen.dart';
@@ -13,8 +13,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  DocumentReference user = FirebaseFirestore.instance
+      .collection("Users")
+      .doc(FirebaseAuth.instance.currentUser!.email.toString());
+
+  String? firstName;
+
+
   @override
   Widget build(BuildContext context) {
+
+    user.get().then((DocumentSnapshot ds) {
+      firstName = ds['nome'];
+      print(firstName);
+    });
+
     return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -40,35 +54,39 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SingleChildScrollView(
           child: Padding(
            padding: EdgeInsets.fromLTRB(
-             5, MediaQuery.of(context).size.height * 0.2, 5, 0),
+             5, MediaQuery.of(context).size.height * 0.1, 5, 0),
 
               child: Column(
                 children:  <Widget>[
                 Row(
                   children:<Widget>[
-                       Text("Benvenuto")
+
+                     const Text("Benvenuto", style: TextStyle(fontSize: 20)),
+                     Text(firstName!, style: TextStyle(fontSize: 20)),
+
+                    ElevatedButton(
+                      child: const Text("Disconnetti"),
+                      style:  ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      )) ,
+                      onPressed: () {
+                        FirebaseAuth.instance.signOut().then((value) {
+                          print("Disconnesso");
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => SignInScreen()));
+
+                        });
+                      },
+                    ),
                   ]),
-                  ElevatedButton(
-                   child: const Text("Disconnetti"),
-                    style:  ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    )) ,
-                    onPressed: () {
-                    FirebaseAuth.instance.signOut().then((value) {
-                    print("Disconnesso");
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => SignInScreen()));
-                    
-            });
-          },
-        ),
+
                   ElevatedButton(onPressed:() {}, child: const Text("Aggiungi una notizia"),
                       style:  ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       )))
-        
+
   ]
-    ))]
+    ))
 
         )));
 
