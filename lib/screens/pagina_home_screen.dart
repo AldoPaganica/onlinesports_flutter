@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:onlinesports_flutter/screens/sign_in_screen.dart';
 
 import '../utils/color_utils.dart';
+import 'aggiungiNotizia.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,21 +14,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
+ String? firstName;
   DocumentReference user = FirebaseFirestore.instance
       .collection("Users")
       .doc(FirebaseAuth.instance.currentUser!.email.toString());
 
-  String? firstName;
 
 
-  @override
+
+
+
+   @override
   Widget build(BuildContext context) {
-
-    user.get().then((DocumentSnapshot ds) {
-      firstName = ds['nome'];
+   user.get().then((DocumentSnapshot ds){
+      firstName= ds['nome'].toString();
       print(firstName);
-    });
+   });
+
+
 
     return Scaffold(
         extendBodyBehindAppBar: true,
@@ -61,14 +65,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children:<Widget>[
 
-                     const Text("Benvenuto", style: TextStyle(fontSize: 20)),
-                     Text(firstName!, style: TextStyle(fontSize: 20)),
+                     const Text("Benvenuto    ", style: TextStyle(fontSize: 20),),
+
+                     Text(style: const TextStyle(fontSize: 20),  firstName.toString()+"  "),
 
                     ElevatedButton(
-                      child: const Text("Disconnetti"),
                       style:  ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
-                      )) ,
+                      )),
+                      child: const Text("Disconnetti") ,
                       onPressed: () {
                         FirebaseAuth.instance.signOut().then((value) {
                           print("Disconnesso");
@@ -80,7 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ]),
 
-                  ElevatedButton(onPressed:() {}, child: const Text("Aggiungi una notizia"),
+                  ElevatedButton(onPressed:() {Navigator.push(context,
+                      MaterialPageRoute(builder: (context) =>aggiungi_notizia()));}, child: const Text("Aggiungi una notizia"),
                       style:  ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       )))
@@ -92,5 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   }
-}
+
+  }
 
