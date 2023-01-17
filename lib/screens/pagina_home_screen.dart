@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
       .collection("Users")
       .doc(FirebaseAuth.instance.currentUser!.email.toString());
 
+
+
    @override
   Widget build(BuildContext context) {
    user.get().then((DocumentSnapshot ds){
@@ -41,12 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
    });
 
 
-    var notizie= db.collection("Notizie").where('ambito', isEqualTo: "Calcio").get().then((QuerySnapshot querySnapshot){
-      for (var doc in querySnapshot.docs) { doc['ambito'];doc['notizia']; doc['utente'];}
-    }
-    );
-      print(notizie);
-      notizia?.addAll(notizie as HashMap<String, String>) ;
 
 
 
@@ -203,6 +199,77 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     Text('Calcio', style: TextStyle(fontSize: 18),)]),
 
+            StreamBuilder(
+              stream: FirebaseFirestore.instance.collection("Notizie").snapshots(),
+              builder: (context, snapshot) {},
+            ),
+                  ListView.builder(
+                    itemBuilder: (context, snapshot) {
+                      DocumentSnapshot products =
+                      snapshot.data.documents[index];
+                      return ProductItem(
+                          name: products['name'],
+                          imageUrl: products['imageURL'],
+                          price: products['price'],
+                          discription: products['description'],
+                      return Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 6.0),
+                                    child: Text(
+                                      notizie[position],
+                                      style: TextStyle(
+                                          fontSize: 22.0, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.fromLTRB(12.0, 6.0, 12.0, 12.0),
+                                    child: Text(
+                                      subjectList[position],
+                                      style: TextStyle(fontSize: 18.0),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: <Widget>[
+                                    Text(
+                                      "5m",
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        Icons.star_border,
+                                        size: 35.0,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          Divider(
+                            height: 2.0,
+                            color: Colors.grey,
+                          )
+                        ],
+                      );
+                    },
+                    itemCount: sendersList.length,
+                  ),
 
   ]))
 
