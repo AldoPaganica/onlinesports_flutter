@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,23 +17,38 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
  String? firstName;
-
+ HashMap<String, String>? notizia;
  bool Calcio=false;
  bool Basket=false;
  bool Pallavolo=false;
  bool Formula_uno=false;
  bool Nuoto=false;
  bool Tennis=false;
-  DocumentReference user = FirebaseFirestore.instance
+ var db= FirebaseFirestore.instance;
+ String? ambito;
+ String? news;
+ String? utente;
+
+ DocumentReference user = FirebaseFirestore.instance
       .collection("Users")
       .doc(FirebaseAuth.instance.currentUser!.email.toString());
 
    @override
   Widget build(BuildContext context) {
    user.get().then((DocumentSnapshot ds){
-      firstName= ds['nome'].toString();
+     firstName= ds['nome'].toString();
       print(firstName);
    });
+
+
+    var notizie= db.collection("Notizie").where('ambito', isEqualTo: "Calcio").get().then((QuerySnapshot querySnapshot){
+      for (var doc in querySnapshot.docs) { doc['ambito'];doc['notizia']; doc['utente'];}
+    }
+    );
+      print(notizie);
+      notizia?.addAll(notizie as HashMap<String, String>) ;
+
+
 
     return Scaffold(
         extendBodyBehindAppBar: true,
@@ -151,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   )),
 
 
-                      Text('Formula uno', style: TextStyle(fontSize: 20),
+                      Text('Formula uno', style: TextStyle(fontSize: 18),
                         ),
                     Switch(
                       onChanged: (value) {
@@ -167,26 +184,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
 
-                    Text('Nuoto', style: TextStyle(fontSize: 20)),]),
-                  Row(children:<Widget>[(Switch(
-                  onChanged: (value) {
-                   setState(() {
-                  Calcio = value;
-                   });
-                    },
-                   value: Calcio,
-                  activeColor: Colors.white,
-                   activeTrackColor: Colors.white,
-                   inactiveThumbColor: Colors.white12,
-                  inactiveTrackColor: Colors.white12,
-        )),
+                    Text('Nuoto', style: TextStyle(fontSize: 15)),
+
+                    (Switch(
+                      onChanged: (value) {
+                        setState(() {
+                          Calcio = value;
+                        });
+
+                      },
+                      value: Calcio,
+                      activeColor: Colors.white,
+                      activeTrackColor: Colors.white,
+                      inactiveThumbColor: Colors.white12,
+                      inactiveTrackColor: Colors.white12,
+                    )),
 
 
-                    Text('Calcio', style: TextStyle(fontSize: 20),)])
-
+                    Text('Calcio', style: TextStyle(fontSize: 18),)]),
 
 
   ]))
+
     )));
 
 
