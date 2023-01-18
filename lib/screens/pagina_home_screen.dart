@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:onlinesports_flutter/screens/sign_in_screen.dart';
 
 import '../utils/color_utils.dart';
+import 'NotizieItem.dart';
 import 'aggiungiNotizia.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,17 +18,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
  String? firstName;
- HashMap<String, String>? notizia;
  bool Calcio=false;
  bool Basket=false;
  bool Pallavolo=false;
  bool Formula_uno=false;
  bool Nuoto=false;
  bool Tennis=false;
- var db= FirebaseFirestore.instance;
- String? ambito;
- String? news;
- String? utente;
+
+
 
  DocumentReference user = FirebaseFirestore.instance
       .collection("Users")
@@ -199,79 +197,212 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     Text('Calcio', style: TextStyle(fontSize: 18),)]),
 
-            StreamBuilder(
-              stream: FirebaseFirestore.instance.collection("Notizie").snapshots(),
-              builder: (context, snapshot) {},
-            ),
-                  ListView.builder(
-                    itemBuilder: (context, snapshot) {
-                      DocumentSnapshot products =
-                      snapshot.data.documents[index];
-                      return ProductItem(
-                          name: products['name'],
-                          imageUrl: products['imageURL'],
-                          price: products['price'],
-                          discription: products['description'],
-                      return Column(
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding:
-                                    const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 6.0),
-                                    child: Text(
-                                      notizie[position],
-                                      style: TextStyle(
-                                          fontSize: 22.0, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                    const EdgeInsets.fromLTRB(12.0, 6.0, 12.0, 12.0),
-                                    child: Text(
-                                      subjectList[position],
-                                      style: TextStyle(fontSize: 18.0),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: <Widget>[
-                                    Text(
-                                      "5m",
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.star_border,
-                                        size: 35.0,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Divider(
-                            height: 2.0,
-                            color: Colors.grey,
-                          )
-                        ],
-                      );
-                    },
-                    itemCount: sendersList.length,
-                  ),
+               if(Calcio== false && Tennis==false && Basket==false && Nuoto==false && Formula_uno==false && Pallavolo==false)
+                 SizedBox(
+                    height: 530,
+                     child: StreamBuilder(
+                       stream: FirebaseFirestore.instance.collection("Notizie").snapshots(),
 
-  ]))
+                       builder: (context, snapshot) {
+
+                         return !snapshot.hasData
+                             ? Text('PLease Wait')
+                             : ListView.builder(
+
+                           padding: const EdgeInsets.only(top: 8.0),
+                            scrollDirection: Axis.vertical,
+                           itemCount: snapshot.data?.docs.length,
+                           itemBuilder: (context, index) {
+                             DocumentSnapshot notizie =
+                             snapshot.data?.docs[index] as DocumentSnapshot<Object?>;
+                             return NotizieItem(
+                                 notizia: notizie['notizia'],
+                                 ambito: notizie['ambito'],
+                                 utente: notizie['utente']);
+
+                           },
+                         );
+                       },
+
+                     )
+                 ),
+                  if(Calcio==true)
+                    SizedBox(
+                        height: 530,
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance.collection("Notizie").where('ambito', isEqualTo: "Calcio").snapshots(),
+
+                          builder: (context, snapshot) {
+
+                            return !snapshot.hasData
+                                ? Text('PLease Wait')
+                                : ListView.builder(
+
+                              padding: const EdgeInsets.only(top: 8.0),
+                              scrollDirection: Axis.vertical,
+                              itemCount: snapshot.data?.docs.length,
+                              itemBuilder: (context, index) {
+                                DocumentSnapshot notizie =
+                                snapshot.data?.docs[index] as DocumentSnapshot<Object?>;
+                                return NotizieItem(
+                                    notizia: notizie['notizia'],
+                                    ambito: notizie['ambito'],
+                                    utente: notizie['utente']);
+
+                              },
+                            );
+                          },
+
+                        )
+                    ),
+                  if(Tennis==true)
+                    SizedBox(
+                        height: 530,
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance.collection("Notizie").where('ambito', isEqualTo: "Tennis").snapshots(),
+
+                          builder: (context, snapshot) {
+
+                            return !snapshot.hasData
+                                ? Text('PLease Wait')
+                                : ListView.builder(
+
+                              padding: const EdgeInsets.only(top: 8.0),
+                              scrollDirection: Axis.vertical,
+                              itemCount: snapshot.data?.docs.length,
+                              itemBuilder: (context, index) {
+                                DocumentSnapshot notizie =
+                                snapshot.data?.docs[index] as DocumentSnapshot<Object?>;
+                                return NotizieItem(
+                                    notizia: notizie['notizia'],
+                                    ambito: notizie['ambito'],
+                                    utente: notizie['utente']);
+
+                              },
+                            );
+                          },
+
+                        )
+                    ),
+                  if(Basket==true)
+                    SizedBox(
+                        height: 530,
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance.collection("Notizie").where('ambito', isEqualTo: "Basket").snapshots(),
+
+                          builder: (context, snapshot) {
+
+                            return !snapshot.hasData
+                                ? Text('PLease Wait')
+                                : ListView.builder(
+
+                              padding: const EdgeInsets.only(top: 8.0),
+                              scrollDirection: Axis.vertical,
+                              itemCount: snapshot.data?.docs.length,
+                              itemBuilder: (context, index) {
+                                DocumentSnapshot notizie =
+                                snapshot.data?.docs[index] as DocumentSnapshot<Object?>;
+                                return NotizieItem(
+                                    notizia: notizie['notizia'],
+                                    ambito: notizie['ambito'],
+                                    utente: notizie['utente']);
+
+                              },
+                            );
+                          },
+
+                        )
+                    ),
+                  if(Formula_uno==true)
+                    SizedBox(
+                        height: 530,
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance.collection("Notizie").where('ambito', isEqualTo: "Formula Uno").snapshots(),
+
+                          builder: (context, snapshot) {
+
+                            return !snapshot.hasData
+                                ? Text('PLease Wait')
+                                : ListView.builder(
+
+                              padding: const EdgeInsets.only(top: 8.0),
+                              scrollDirection: Axis.vertical,
+                              itemCount: snapshot.data?.docs.length,
+                              itemBuilder: (context, index) {
+                                DocumentSnapshot notizie =
+                                snapshot.data?.docs[index] as DocumentSnapshot<Object?>;
+                                return NotizieItem(
+                                    notizia: notizie['notizia'],
+                                    ambito: notizie['ambito'],
+                                    utente: notizie['utente']);
+
+                              },
+                            );
+                          },
+
+                        )
+                    ),
+                  if(Pallavolo==true)
+                    SizedBox(
+                        height: 530,
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance.collection("Notizie").where('ambito', isEqualTo: "Pallavolo").snapshots(),
+
+                          builder: (context, snapshot) {
+
+                            return !snapshot.hasData
+                                ? Text('PLease Wait')
+                                : ListView.builder(
+
+                              padding: const EdgeInsets.only(top: 8.0),
+                              scrollDirection: Axis.vertical,
+                              itemCount: snapshot.data?.docs.length,
+                              itemBuilder: (context, index) {
+                                DocumentSnapshot notizie =
+                                snapshot.data?.docs[index] as DocumentSnapshot<Object?>;
+                                return NotizieItem(
+                                    notizia: notizie['notizia'],
+                                    ambito: notizie['ambito'],
+                                    utente: notizie['utente']);
+
+                              },
+                            );
+                          },
+
+                        )
+                    ),
+                  if(Nuoto==true)
+                    SizedBox(
+                        height: 530,
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance.collection("Notizie").where('ambito', isEqualTo: "Nuoto").snapshots(),
+
+                          builder: (context, snapshot) {
+
+                            return !snapshot.hasData
+                                ? Text('PLease Wait')
+                                : ListView.builder(
+
+                              padding: const EdgeInsets.only(top: 8.0),
+                              scrollDirection: Axis.vertical,
+                              itemCount: snapshot.data?.docs.length,
+                              itemBuilder: (context, index) {
+                                DocumentSnapshot notizie =
+                                snapshot.data?.docs[index] as DocumentSnapshot<Object?>;
+                                return NotizieItem(
+                                    notizia: notizie['notizia'],
+                                    ambito: notizie['ambito'],
+                                    utente: notizie['utente']);
+
+                              },
+                            );
+                          },
+
+                        )
+                    ),
+
+                    
+                ]))
 
     )));
 
